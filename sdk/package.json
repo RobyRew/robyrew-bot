@@ -1,0 +1,11 @@
+{
+  "name": "@robyrew/bot-sdk",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "Command contract for RobyRew product bots. The Telegram process lives in robyrew-bot.",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "types": "./index.ts"
+}

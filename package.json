@@ -1,0 +1,25 @@
+{
+  "name": "robyrew-bot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "One Telegram bot that loads a command module from each RobyRew product repo.",
+  "engines": { "node": ">=26" },
+  "scripts": {
+    "start": "node --import ../chat-converter/node_modules/tsx/dist/esm/index.mjs src/main.ts",
+    "test": "node --import ../chat-converter/node_modules/tsx/dist/esm/index.mjs --test test/*.ts"
+  },
+  "dependencies": {
+    "@robyrew/bot-sdk": "file:./sdk",
+    "@robyrew/cal-bot": "file:../calendar-event-generator/bot",
+    "@robyrew/convert-bot": "file:../chat-converter/bot",
+    "@robyrew/door-bot": "file:../Doorline/bot",
+    "@robyrew/lesson-bot": "file:../biserica/bot",
+    "@robyrew/map-bot": "file:../mapswitch/bot",
+    "@robyrew/me-bot": "file:../portfolio/bot",
+    "@robyrew/ppt-bot": "file:../powerpoint-extractor/bot",
+    "@robyrew/spotify-bot": "file:../spotify-versions-history/bot",
+    "@robyrew/tide-bot": "file:../XCode/PaceTimer/bot",
+    "@robyrew/verse-bot": "file:../bibletype/bot"
+  }
+}
