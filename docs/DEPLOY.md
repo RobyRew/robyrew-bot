@@ -10,7 +10,8 @@ Env on the VPS, not in git:
 - `TELEGRAM_ADMIN_ID`
 - `PUBLIC_BASE` — `https://` origin of this service, used for the Logto return and the door page
 - `LOGTO_ENDPOINT` `LOGTO_APP_ID` `LOGTO_APP_SECRET`
-- `SESSION_ENCRYPTION_KEY` — 64 hex characters
+- `SESSION_ENCRYPTION_KEY` — 64 hex characters. Door linking stays off when this is missing.
+- `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` — optional. Without them, a Spotify link uses the public oEmbed title and artwork.
 - `DATA_DIR` — SQLite and nothing else
 - `PORT` — default 8787
 

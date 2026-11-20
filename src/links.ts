@@ -12,9 +12,9 @@ const LINKS: Record<string, { about: Record<Lang, string>; url?: string }> = {
   },
   linkedin: {
     about: {
-      en: 'LinkedIn Professional is an on-device tweak. It has no chat command.',
-      ro: 'LinkedIn Professional e un tweak pe telefon. Nu are comandă în chat.',
-      es: 'LinkedIn Professional es un tweak en el teléfono. No tiene comando en el chat.',
+      en: 'Send a public LinkedIn link and the bot reads that page. The on-device tweak has no remote command.',
+      ro: 'Trimite un link public LinkedIn și botul citește pagina. Tweak-ul de pe telefon nu are comandă de la distanță.',
+      es: 'Envía un enlace público de LinkedIn y el bot lee esa página. El tweak del teléfono no tiene comando remoto.',
     },
     url: 'https://github.com/RobyRew/linkedin-pro-ios',
   },

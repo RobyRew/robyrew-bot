@@ -13,6 +13,8 @@ import { lessonModule } from '@robyrew/lesson-bot'
 import { mapModule } from '@robyrew/map-bot'
 import { pptModule, textFromPptx } from '@robyrew/ppt-bot'
 import { setCatalogLoader, spotifyModule, type CatalogFile } from '@robyrew/spotify-bot'
+import { clearSpotifyToken, parseSpotifyUrl, setSpotifyFetch } from '../../spotify-versions-history/bot/open.ts'
+import { linkedInModule, setLinkedInFetch } from '@robyrew/linkedin-bot'
 import { tideModule } from '@robyrew/tide-bot'
 import { CHAPTERS, NAMES } from '../../bibletype/bot/books.ts'
 import { verseModule } from '@robyrew/verse-bot'
@@ -279,6 +281,63 @@ test('repo striker is a link and admin ban blocks the next message', async () =>
   const banned = await handleInbound(app, inbound({ userId: '2', text: '/map 1, 1', command: 'map', args: '1, 1' }))
   assert.match(textOf(banned), /cannot use/)
   assert.equal(logs.some((line) => line.includes('s3cret') || line.includes('Hello')), false)
+  store.close()
+})
+
+test('a spotify link returns the title, artwork, and playlist rows, not a full audio file', async () => {
+  delete process.env.SPOTIFY_CLIENT_ID
+  delete process.env.SPOTIFY_CLIENT_SECRET
+  clearSpotifyToken()
+  process.env.SPOTIFY_CLIENT_ID = 'test-id'
+  process.env.SPOTIFY_CLIENT_SECRET = 'test-secret'
+  setSpotifyFetch(async (url) => {
+    if (url.includes('/api/token')) return Response.json({ access_token: 'app-token', expires_in: 3600 })
+    if (url.includes('/playlists/pl1')) {
+      return Response.json({
+        name: 'Mix',
+        images: [{ url: 'https://i.scdn.co/image/cover' }],
+        tracks: { items: [{ track: { name: 'One', artists: [{ name: 'A' }], preview_url: 'https://p.scdn.co/mp3-preview/x' } }] },
+      })
+    }
+    if (url.includes('i.scdn.co')) return new Response(Uint8Array.from([1, 2, 3]))
+    if (url.includes('p.scdn.co')) return new Response(Uint8Array.from([4, 5]))
+    return new Response('no', { status: 404 })
+  })
+  const store = new Store(':memory:')
+  store.setLang('9', 'en')
+  const { app } = appFor(store, [spotifyModule])
+  const replies = await handleInbound(app, inbound({ userId: '9', text: 'https://open.spotify.com/playlist/pl1' }))
+  const text = textOf(replies)
+  assert.match(text, /Mix/)
+  assert.match(text, /A — One/)
+  assert.equal(text.includes('test-secret'), false)
+  assert.equal(text.includes('app-token'), false)
+  assert.ok(replies.some((reply) => reply.kind === 'file' && reply.filename === 'artwork.jpg'))
+  assert.ok(replies.some((reply) => reply.kind === 'file' && reply.filename === 'preview.mp3'))
+  assert.equal(parseSpotifyUrl('https://open.spotify.com/track/abcDEF123')?.kind, 'track')
+  delete process.env.SPOTIFY_CLIENT_ID
+  delete process.env.SPOTIFY_CLIENT_SECRET
+  clearSpotifyToken()
+  setSpotifyFetch(null)
+  store.close()
+})
+
+test('a public linkedin page returns text and image, and a login wall does not ask for a password', async () => {
+  setLinkedInFetch(async (url) => {
+    if (url.includes('media.licdn.com')) return new Response(Uint8Array.from([7]))
+    if (url.includes('authwall')) return new Response('<html>authwall join linkedin</html>', { status: 200 })
+    return new Response('<html><meta property="og:title" content="A post"><meta property="og:description" content="Hello from the post"><meta property="og:image" content="https://media.licdn.com/pic.jpg"></html>', { status: 200 })
+  })
+  const store = new Store(':memory:')
+  store.setLang('9', 'en')
+  const { app } = appFor(store, [linkedInModule])
+  const replies = await handleInbound(app, inbound({ userId: '9', text: 'https://www.linkedin.com/posts/someone-activity-1' }))
+  assert.match(textOf(replies), /Hello from the post/)
+  assert.equal(textOf(replies).toLowerCase().includes('password'), false)
+  assert.ok(replies.some((reply) => reply.kind === 'file' && reply.filename === 'image.jpg'))
+  const wall = await handleInbound(app, inbound({ userId: '9', text: 'https://www.linkedin.com/authwall' }))
+  assert.match(textOf(wall), /without an account/)
+  setLinkedInFetch(null)
   store.close()
 })
 

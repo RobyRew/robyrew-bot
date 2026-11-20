@@ -111,10 +111,16 @@ export async function handleInbound(app: App, input: Inbound): Promise<Reply[]> 
     mod = app.modules.find((m) => m.id === id)
   }
   if (!mod) {
-    // Bare text: map if it looks like a link or coordinates, else unknown.
-    if (!requested && /https?:\/\/|geo:|\d+\.\d+\s*,\s*-?\d+/.test(msg.text)) {
+    const blob = `${msg.text}\n${args}`
+    if (/https?:\/\/([a-z0-9-]+\.)?linkedin\.com\//i.test(blob)) {
+      mod = findModule(app.modules, 'linkedin')
+      args = blob
+    } else if (/https?:\/\/open\.spotify\.com\//i.test(blob)) {
+      mod = findModule(app.modules, 'spotify')
+      args = blob
+    } else if (/https?:\/\/|geo:|\d+\.\d+\s*,\s*-?\d+/.test(blob)) {
       mod = findModule(app.modules, 'map')
-      args = msg.text
+      args = blob
     }
   }
   if (!mod) return [{ kind: 'text', text: hostText(lang, 'unknown') }]

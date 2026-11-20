@@ -15,6 +15,7 @@
     "@robyrew/convert-bot": "file:../chat-converter/bot",
     "@robyrew/door-bot": "file:../Doorline/bot",
     "@robyrew/lesson-bot": "file:../biserica/bot",
+    "@robyrew/linkedin-bot": "file:../linkedin-pro-ios/bot",
     "@robyrew/map-bot": "file:../mapswitch/bot",
     "@robyrew/me-bot": "file:../portfolio/bot",
     "@robyrew/ppt-bot": "file:../powerpoint-extractor/bot",
