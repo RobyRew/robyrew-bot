@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecția 18 – Disponibilitatea</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400..800&display=swap" rel="stylesheet">
+    <style>
+        /* TOKENS — --line #bcc6d4 ≈ 23% grey, --dot #67738a ≈ 55%; tints under ~15% grey
+           tend to drop out on office lasers, so the card tints carry no meaning on their own */
+        :root {
+            color-scheme: light;
+            --ink: #0f172a;
+            --ink-2: #334155;
+            --muted: #5b6577;
+            --line: #bcc6d4;
+            --line-2: #c3cddb;
+            --dot: #67738a;
+            --paper: #ffffff;
+            --desk: #e6eaf0;
+            --blue: #1559c0;
+            --blue-2: #1e6fd9;
+            --blue-deep: #1e3a8a;
+            --green: #15803d;
+            --green-tint: #e5f4ea;
+            --rose: #b42318;
+            --rose-tint: #fbe9e7;
+            --sans: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+            --serif: "Fraunces", "Iowan Old Style", Palatino, Georgia, serif;
+        }
+
+        /* RESET & PRINT COLOR */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+        body {
+            margin: 0;
+            padding: 12mm 0 16mm;
+            background: var(--desk);
+            color: var(--ink);
+            font-family: var(--sans);
+            font-size: 9pt;
+            line-height: 1.42;
+            font-feature-settings: "cv11", "ss03";
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        h1, h2, p, ol, ul { margin: 0; padding: 0; }
+        ol, ul { list-style: none; }
+
+        /* A4 SHEET */
+        .sheet {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            padding: 10mm 14mm 8mm;
+            background: var(--paper);
+            box-shadow: 0 1px 2px rgba(15, 23, 42, .06), 0 12px 40px rgba(15, 23, 42, .12);
+            display: flex;
+            flex-direction: column;
+            gap: 3.6mm;
+            overflow: hidden;
+        }
+
+        /* ICONS */
+        .ico {
+            width: 1em;
+            height: 1em;
+            flex: none;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* MASTHEAD */
+        .masthead {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 8mm;
+            padding-bottom: 2.6mm;
+            border-bottom: .3mm solid var(--line);
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 2.5mm;
+            font-size: 7pt;
+            font-weight: 650;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--blue);
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 9mm;
+            height: 1mm;
+            border-radius: 1mm;
+            background: linear-gradient(90deg, var(--blue-2), var(--blue-deep));
+        }
+
+        h1 {
+            margin-top: 1.6mm;
+            font-family: var(--serif);
+            font-optical-sizing: auto;
+            font-weight: 600;
+            font-size: 26pt;
+            line-height: .95;
+            letter-spacing: -.025em;
+        }
+
+        .lesson-tile {
+            flex: none;
+            width: 14mm;
+            height: 14mm;
+            border-radius: 3.2mm;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: .3mm;
+            background: linear-gradient(150deg, var(--blue-2), var(--blue-deep));
+            color: #fff;
+        }
+
+        .lesson-tile small {
+            font-size: 7pt;
+            font-weight: 700;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+        }
+
+        .lesson-tile b {
+            font-family: var(--serif);
+            font-weight: 600;
+            font-size: 17pt;
+            line-height: 1;
+            letter-spacing: -.02em;
+        }
+
+        /* SECTION HEAD (letter badge + title) */
+        .sec-head {
+            display: flex;
+            align-items: center;
+            gap: 2.4mm;
+            margin-bottom: 1.8mm;
+        }
+
+        .letter {
+            flex: none;
+            width: 6.2mm;
+            height: 6.2mm;
+            border-radius: 1.8mm;
+            display: grid;
+            place-items: center;
+            background: var(--blue);
+            color: #fff;
+            font-family: var(--serif);
+            font-weight: 600;
+            font-size: 10pt;
+            line-height: 1;
+        }
+
+        .sec-title {
+            font-size: 10.5pt;
+            font-weight: 700;
+            letter-spacing: -.01em;
+            line-height: 1.25;
+        }
+
+        /* WRITE-IN LINES — dotted borders; WebKit printed gradient-drawn rules as solid black bars */
+        .lines {
+            --pitch: 5.6mm;
+        }
+
+        .line {
+            display: flex;
+            align-items: flex-end;
+            gap: 1.8mm;
+            height: var(--pitch);
+        }
+
+        .line i {
+            flex: 1;
+            border-bottom: .5mm dotted var(--dot);
+        }
+
+        .line i.short {
+            flex: 0 0 34mm;
+            margin-right: 2.4mm;
+        }
+
+        .lines.small { --pitch: 5mm; }
+
+        .lab {
+            flex: none;
+            padding-bottom: .5mm;
+            font-size: 7pt;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        /* A–D GRID */
+        /* A is the short definition (narrow) and B the daily example (wide).
+           C and D each carry five references, so they split that row. */
+        .grid-ad {
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            gap: 2.8mm;
+        }
+
+        .grid-ad > .narrow { grid-column: span 8; }
+        .grid-ad > .wide { grid-column: span 12; }
+        .grid-ad > .half { grid-column: span 10; }
+
+        .card {
+            padding: 2.6mm 3.4mm 2.8mm;
+            border: .3mm solid var(--line);
+            border-radius: 3mm;
+        }
+
+        .card .sec-head { margin-bottom: 1mm; }
+        .card .sec-title { font-size: 9.6pt; }
+
+        .card.pos { background: linear-gradient(160deg, var(--green-tint), #fff 65%); }
+        .card.neg { background: linear-gradient(160deg, var(--rose-tint), #fff 65%); }
+        .card.pos .letter { background: var(--green); }
+        .card.neg .letter { background: var(--rose); }
+        .card.pos .sec-head, .card.neg .sec-head { margin-bottom: 1.6mm; }
+
+        .refs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.1mm;
+        }
+
+        .ref {
+            display: inline-flex;
+            align-items: center;
+            gap: 1mm;
+            padding: .3mm 1.8mm;
+            border: .25mm solid var(--line-2);
+            border-radius: 99px;
+            background: var(--paper);
+            font-size: 7.8pt;
+            font-weight: 600;
+            color: var(--ink-2);
+            white-space: nowrap;
+        }
+
+        .pos .ref .ico { color: var(--green); font-size: 7.5pt; }
+        .neg .ref .ico { color: var(--rose); font-size: 7.5pt; }
+
+        /* E: QUESTION → WRITE-IN ROWS */
+        .qa li {
+            display: grid;
+            grid-template-columns: 5mm 1fr 1.1fr;
+            column-gap: 3.5mm;
+            align-items: start;
+            padding-bottom: 2.4mm;
+        }
+
+        /* Questions are separated by the padding above; the answer line is shortened so
+           its dots sit on the question's first baseline. */
+        .qa li:last-child { padding-bottom: 0; }
+        .qa .line { height: 4.6mm; }
+
+        /* Drops the number and question so their first baseline sits on the first dotted line. */
+        .num, .q { padding-top: .8mm; }
+
+        .num {
+            font-family: var(--serif);
+            font-weight: 600;
+            font-size: 10pt;
+            line-height: 1.2;
+            color: var(--blue);
+            font-variant-numeric: lining-nums tabular-nums;
+        }
+
+        .q {
+            font-size: 8.6pt;
+            font-weight: 600;
+            color: var(--ink-2);
+            line-height: 1.38;
+            text-wrap: pretty;
+        }
+
+        .keep { white-space: nowrap; }
+
+        /* F: MEMORY VERSE — chips are options; the reader writes the one they pick */
+        .verse-lines {
+            margin-top: 1.4mm;
+            padding-left: 3.6mm;
+            border-left: 1mm solid var(--blue);
+        }
+
+        /* G: SELF-EVALUATION */
+        .selfcheck {
+            display: grid;
+            grid-template-columns: 1fr 89mm;
+            column-gap: 5mm;
+        }
+
+        .selfcheck ol + ol {
+            position: relative;
+        }
+
+        .selfcheck ol + ol::before {
+            content: "";
+            position: absolute;
+            left: -2.5mm;
+            top: 1mm;
+            bottom: 1mm;
+            border-left: .3mm solid var(--line);
+        }
+
+        .selfcheck li {
+            display: grid;
+            grid-template-columns: 6.5mm 1fr;
+            column-gap: 2mm;
+            align-items: baseline;
+            padding: .8mm 0;
+            font-size: 8.3pt;
+            line-height: 1.34;
+            color: var(--ink-2);
+        }
+
+        /* Write-in line under each question, in the text column */
+        .selfcheck .line {
+            grid-column: 2;
+            height: 4.8mm;
+        }
+
+        .selfcheck .n {
+            font-size: 7.4pt;
+            font-weight: 700;
+            color: var(--blue);
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+
+        /* SCREEN-ONLY TOOLBAR */
+        .toolbar {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 10;
+            padding: 6px;
+            border-radius: 99px;
+            background: rgba(15, 23, 42, .88);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, .25);
+        }
+
+        .toolbar button {
+            border: 0;
+            border-radius: 99px;
+            padding: 8px 16px;
+            background: #fff;
+            color: var(--ink);
+            font: 600 13px/1 var(--sans);
+            cursor: pointer;
+        }
+
+        /* SMALL SCREENS: scale the sheet down instead of scrolling sideways */
+        @media screen and (max-width: 860px) { body { padding: 16px 0 80px; } .sheet { zoom: .86; } }
+        @media screen and (max-width: 740px) { .sheet { zoom: .72; } }
+        @media screen and (max-width: 620px) { .sheet { zoom: .58; } }
+        @media screen and (max-width: 500px) { .sheet { zoom: .47; } }
+        @media screen and (max-width: 400px) { .sheet { zoom: .42; } }
+
+        /* PRINT */
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        @media print {
+            html, body { background: var(--paper); }
+            body { padding: 0; }
+
+            /* WebKit rounds the A4 page box down to whole pixels; a full 297mm sheet
+               overflows it by a fraction and pushes a blank second page. */
+            .sheet {
+                height: 296.5mm;
+                box-shadow: none;
+                zoom: 1;
+            }
+
+            .toolbar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    </svg>
+
+    <main class="sheet">
+
+        <header class="masthead">
+            <div>
+                <p class="eyebrow">Studiu biblic</p>
+                <h1>Disponibilitatea</h1>
+            </div>
+            <div class="lesson-tile"><small>Lecția</small><b>18</b></div>
+        </header>
+
+        <!-- A–D -->
+        <section class="grid-ad">
+            <div class="card narrow">
+                <div class="sec-head"><span class="letter">A</span><h2 class="sec-title">Definiția disponibilității</h2></div>
+                <div class="lines">
+                    <div class="line"><i></i></div>
+                </div>
+            </div>
+
+            <div class="card wide">
+                <div class="sec-head"><span class="letter">B</span><h2 class="sec-title">Un exemplu din viața mea de fiecare zi</h2></div>
+                <div class="lines">
+                    <div class="line"><i></i></div>
+                </div>
+            </div>
+
+            <div class="card pos half">
+                <div class="sec-head"><span class="letter">C</span><h2 class="sec-title">Un exemplu pozitiv din Biblie</h2></div>
+                <p class="refs">
+                    <span class="ref"><svg class="ico"><use href="#i-check"/></svg>Gen. 12:1-9</span>
+                    <span class="ref"><svg class="ico"><use href="#i-check"/></svg>Mat. 4:18-22</span>
+                    <span class="ref"><svg class="ico"><use href="#i-check"/></svg>Luca 1:26-38</span>
+                    <span class="ref"><svg class="ico"><use href="#i-check"/></svg>Luca 18:15-16</span>
+                    <span class="ref"><svg class="ico"><use href="#i-check"/></svg>Fapte 6:1-8</span>
+                </p>
+                <div class="lines small">
+                    <div class="line"><i></i></div>
+                </div>
+            </div>
+
+            <div class="card neg half">
+                <div class="sec-head"><span class="letter">D</span><h2 class="sec-title">Un exemplu negativ din Biblie</h2></div>
+                <p class="refs">
+                    <span class="ref"><svg class="ico"><use href="#i-x"/></svg>Gen. 3:9-10</span>
+                    <span class="ref"><svg class="ico"><use href="#i-x"/></svg>Ex. 4:1-17</span>
+                    <span class="ref"><svg class="ico"><use href="#i-x"/></svg>Iona 1:1-4</span>
+                    <span class="ref"><svg class="ico"><use href="#i-x"/></svg>Mat. 25:14-30</span>
+                    <span class="ref"><svg class="ico"><use href="#i-x"/></svg>2 Tim. 4:9-10</span>
+                </p>
+                <div class="lines small">
+                    <div class="line"><i></i></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- E -->
+        <section>
+            <div class="sec-head"><span class="letter">E</span><h2 class="sec-title">Să mă gândesc la disponibilitate în viața mea</h2></div>
+            <ol class="qa">
+                <li>
+                    <span class="num">1</span>
+                    <p class="q">Când am fost eu cel mai mult la dispoziția Domnului sau a altora?</p>
+                    <div class="lines"><div class="line"><i></i></div></div>
+                </li>
+                <li>
+                    <span class="num">2</span>
+                    <p class="q">În care situație specifică nu am fost disponibil/ă?</p>
+                    <div class="lines"><div class="line"><i></i></div></div>
+                </li>
+                <li>
+                    <span class="num">3</span>
+                    <p class="q">Ce problemă din viața mea ar putea folosi Dumnezeu pentru a zidi în mine disponibilitate?</p>
+                    <div class="lines"><div class="line"><i></i></div></div>
+                </li>
+                <li>
+                    <span class="num">4</span>
+                    <p class="q">Cine ar putea fi pentru mine un model creștin de disponibilitate?</p>
+                    <div class="lines"><div class="line"><i></i></div></div>
+                </li>
+                <li>
+                    <span class="num">5</span>
+                    <p class="q">Cum pot dezvolta această calitate în viața mea?</p>
+                    <div class="lines"><div class="line"><i></i></div></div>
+                </li>
+            </ol>
+        </section>
+
+        <!-- F -->
+        <section>
+            <div class="sec-head"><span class="letter">F</span><h2 class="sec-title">Un verset pe care îl voi învăța pentru a-mi aminti să fiu disponibil/ă</h2></div>
+            <p class="refs">
+                <span class="ref">Isaia 6:8</span>
+                <span class="ref">Luca 1:38</span>
+                <span class="ref">Luca 16:10</span>
+                <span class="ref">Rom. 6:13</span>
+                <span class="ref">Rom. 12:1</span>
+                <span class="ref">1 Cor. 4:2</span>
+            </p>
+            <div class="lines verse-lines">
+                <div class="line"><span class="lab">Referința</span><i class="short"></i><span class="lab">Textul</span><i></i></div>
+            </div>
+        </section>
+
+        <!-- G -->
+        <section>
+            <div class="sec-head"><span class="letter">G</span><h2 class="sec-title">Autoevaluarea</h2></div>
+            <div class="selfcheck">
+            <ol>
+                <li><span class="n">1</span><span>Arăt părinților, prietenilor, colegilor că sunt la dispoziția lor?</span><span class="line"><i></i></span></li>
+                <li><span class="n">2</span><span>Apelează oamenii la mine pentru ajutor?</span><span class="line"><i></i></span></li>
+                <li><span class="n">3</span><span>Îmi folosesc darurile pentru a zidi trupul lui Hristos?</span><span class="line"><i></i></span></li>
+                <li><span class="n">4</span><span>Mi-am aranjat prioritățile în așa fel încât să pot spune „da” nevoilor legitime ale altora?</span><span class="line"><i></i></span></li>
+                <li><span class="n">5</span><span>Sunt liber de tirania timpului, ca să nu trebuiască mereu să spun altora că sunt ocupat?</span><span class="line"><i></i></span></li>
+                <li><span class="n">6</span><span>Accept de bunăvoie însărcinările încredințate mie?</span><span class="line"><i></i></span></li>
+                <li><span class="n">7</span><span>Doresc să spun „da” acelor treburi care îmi depășesc puterile, știind că Dumnezeu îmi va da har?</span><span class="line"><i></i></span></li>
+                <li><span class="n">8</span><span>Petrec câtva timp ascultând ceea ce spune Dumnezeu, pentru a fi suficient de sensibil privitor la ceea ce vrea El să fac?</span><span class="line"><i></i></span></li>
+            </ol>
+            <ol start="9">
+                <li><span class="n">9</span><span>Pot eu să privesc întreruperile ca oportunități de a satisface nevoile altora, sau permit ca acestea să mă facă să mă simt frustrat?</span><span class="line"><i></i></span></li>
+                <li><span class="n">10</span><span>Am renunțat eu la scopurile mele pentru a le împlini pe cele ale lui Dumnezeu?</span><span class="line"><i></i></span></li>
+                <li><span class="n">11</span><span>I-am spus eu lui Dumnezeu, ca Isaia: <span class="keep">„Iată-mă, trimite-mă”</span>?</span><span class="line"><i></i></span></li>
+                <li><span class="n">12</span><span>A câștigat Dumnezeu bătălia în viața mea în ceea ce privește a cui voință va domni în viața mea, a lui Dumnezeu sau a mea?</span><span class="line"><i></i></span></li>
+                <li><span class="n">13</span><span>M-am simțit vinovat vreodată pentru că nu am fost disponibil față de cineva, când știam că Dumnezeu vrea să fiu la dispoziția lui?</span><span class="line"><i></i></span></li>
+                <li><span class="n">14</span><span>Sunt satisfăcut cu nivelul meu actual de disponibilitate față de Dumnezeu și față de alții?</span><span class="line"><i></i></span></li>
+            </ol>
+            </div>
+        </section>
+
+    </main>
+
+    <div class="toolbar">
+        <button type="button" onclick="window.print()">Tipărește</button>
+    </div>
+
+</body>
+</html>

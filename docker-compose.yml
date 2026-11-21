@@ -1,0 +1,35 @@
+# Dokploy: create an application from this GitHub repo and use this compose file.
+# Set the variables in Dokploy's environment screen. Do not commit their values.
+services:
+  robyrew-bot:
+    build: .
+    restart: unless-stopped
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_ADMIN_ID: ${TELEGRAM_ADMIN_ID}
+      PUBLIC_BASE: ${PUBLIC_BASE:-https://bot.robyrew.com}
+      PORT: "8787"
+      DATA_DIR: /data
+      SESSION_ENCRYPTION_KEY: ${SESSION_ENCRYPTION_KEY}
+      LOGTO_ENDPOINT: ${LOGTO_ENDPOINT:-}
+      LOGTO_APP_ID: ${LOGTO_APP_ID:-}
+      LOGTO_APP_SECRET: ${LOGTO_APP_SECRET:-}
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID:-}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET:-}
+    volumes:
+      - robyrew-bot-data:/data
+    networks:
+      - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.robyrew-bot.rule=Host(`bot.robyrew.com`)
+      - traefik.http.routers.robyrew-bot.entrypoints=websecure
+      - traefik.http.routers.robyrew-bot.tls.certresolver=letsencrypt
+      - traefik.http.services.robyrew-bot.loadbalancer.server.port=8787
+
+networks:
+  dokploy-network:
+    external: true
+
+volumes:
+  robyrew-bot-data:
